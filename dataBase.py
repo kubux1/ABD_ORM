@@ -5,123 +5,53 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 Base = declarative_base()
 
 
-class Gym(Base):
-    __tablename__ = 'gyms'
+class Dostawa(Base):
+    __tablename__ = 'dostawa'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    address = Column(String)
-    roomsQuantity = Column(Integer)
+    adresDostawcy = Column(String)
+    nazwaDostawcy = Column(String)
+    dataDostawy = Column(String)
+    ocenaDostawy = Column(Integer)
 
-    groupClass = relationship("GroupClass")
-    coach = relationship("Coach")
+    produkty = relationship("Produkt")
 
-    def __init__(self, name, address, roomsQuantity):
-        self.name = name
-        self.address = address
-        self.roomsQuantity = roomsQuantity
+    def __init__(self, adresDostawcy, nazwaDostawcy, dataDostawy):
+        self.adresDostawcy = adresDostawcy
+        self.nazwaDostawcy = nazwaDostawcy
+        self.dataDostawy = dataDostawy
 
     def __repr__(self):
-        return "<Gym(name='%s', address='%s', roomsQuantity='%d')>" % (
-                                         self.name, self.address, self.roomsQuantity)
+        return "<Dostawa(adresDostawcy='%s', nazwaDostawcy='%s', dataDostawy='%s')>" % (
+                                         self.adresDostawcy, self.nazwaDostawcy, self.dataDostawy)
 
-
-class Coach(Base):
-    __tablename__ = 'coaches'
+class Produkt(Base):
+    __tablename__ = 'produkt'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    surname = Column(String)
-    gymFKID = Column(Integer, ForeignKey('gyms.id'))
+    liczbaNaStanie = Column(Integer)
+    typ = Column(Integer, ForeignKey('typProduktu.id'))
 
-    gym = relationship("Gym", backref=backref('coaches', order_by=id))
-    groupClass = relationship("GroupClass")
-
-    def __init__(self, id, name, surname):
-        self.id = id
-        self.name = name
-        self.surname = surname
+    def __init__(self, liczbaNaStanie, typ):
+        self.liczbaNaStanie = liczbaNaStanie
+        self.typ = typ
 
     def __repr__(self):
-        return "<Coach(id = %d, name='%s', surname='%s')>" % (
+        return "<Produkt(liczbaNaStanie = %d, typ='%d')>" % (
+            self.liczbaNaStanie, self.typ)
 
-
-self.id, self.name, self.surname)
-
-class Client(Base):
-    __tablename__ = 'clients'
+class TypProduktu(Base):
+    __tablename__ = 'typProduktu'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    surname = Column(String)
-    sex = Column(String)
-    age = Column(Integer)
-    enrollment = relationship("Enrollment")
+    nazwa = Column(String)
 
-    def __init__(self, id, name, surname, sex, age):
-        self.id = id
-        self.name = name
-        self.surname = surname
-        self.sex = sex
-        self.age = age
+    def __init__(self, nazwa):
+        self.nazwa = nazwa
 
     def __repr__(self):
-        return "<Client(id=%d, name='%s', surname='%s', Sex='%s', Age='%d')>" % (
-                                         self.id, self.name, self.surname, self.sex, self.age)
-
-
-class GroupClass(Base):
-    __tablename__ = 'groupClasses'
-
-    id = Column(Integer, primary_key=True)
-    className = Column(String)
-    maxSeats = Column(Integer)
-    gymID = Column(Integer, ForeignKey('gyms.id') )
-    coachID = Column(Integer, ForeignKey('coaches.id'))
-    term = relationship("Term")
-
-    def __init__(self, className, maxSeats):
-        self.className = className
-        self.maxSeats = maxSeats
-
-    def __repr__(self):
-        return "<GroupClass(className='%s', maxSeats='%d')>" % (
-                                         self.className, self.maxSeats)
-
-
-class Term(Base):
-    __tablename__ = 'terms'
-
-    id = Column(Integer, primary_key=True)
-    classDate = Column(String)
-    duration = Column(Integer)
-    groupClassID = Column(Integer, ForeignKey('groupClasses.id'))
-    enrollment = relationship("Enrollment")
-
-    def __init__(self, classDate, duration):
-        self.classDate = classDate
-        self.duration = duration
-
-    def __repr__(self):
-        return "<GroupClass(classDate='%s', duration='%d')>" % (
-                                         self.classDate, self.duration)
-
-
-class Enrollment(Base):
-    __tablename__ = 'enrollments'
-
-    id = Column(Integer, primary_key=True)
-    clientID = Column(Integer, ForeignKey('clients.id'))
-    termID = Column(Integer, ForeignKey('terms.id'))
-
-    def __init__(self, clientID, termID):
-        self.clientID = clientID
-        self.termID = termID
-
-    def __repr__(self):
-        return "<Enrollment(clientID='%d', termID='%d')>" % (
-            self.clientID, self.termID)
-
+        return "<TypProduktu(nazwa = %s)>" % (
+            self.nazwa)
 
 engine = create_engine('sqlite:///:memory:', echo=True)
 Base.metadata.create_all(engine)
